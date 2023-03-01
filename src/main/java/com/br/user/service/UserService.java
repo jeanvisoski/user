@@ -2,10 +2,14 @@ package com.br.user.service;
 
 
 
+import com.br.user.entity.Motorcycle;
 import com.br.user.entity.User;
+import com.br.user.exception.ResourceNotFoundException;
 import com.br.user.exception.UserAlreadyExistsException;
 import com.br.user.exception.UserNotFoundException;
+import com.br.user.repository.MotorcycleRepository;
 import com.br.user.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,23 +18,13 @@ import java.util.List;
 @Service
 public class UserService {
 
+    @Autowired
     private UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private MotorcycleRepository motorcycleRepository;
 
     public User register(User user) {
-        // Verifica se o usuário já existe
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new UserAlreadyExistsException("User already exists with email: " + user.getEmail());
-        }
-
-        // Criptografa a senha
-        String encodedPassword = new BCryptPasswordEncoder().encode(user.getPassword());
-        user.setPassword(encodedPassword);
-
-        // Salva o usuário no banco de dados
         return userRepository.save(user);
     }
 
@@ -42,6 +36,23 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
+
+    public User updateUserMotorcycle(String userId, Long motorcycleId) {
+        User user = userRepository.findById(userId).get();
+        Motorcycle motorcycle = motorcycleRepository.findById(motorcycleId).get();
+
+        // Encontra a moto correspondente na lista de motos do usuário
+        User userMotorcycle = user;
+
+        // Atualiza os atributos da moto correspondente
+        userMotorcycle.setMotorcycles(motorcycle);
+
+        // Salva as atualizações no banco de dados
+        userRepository.save(userMotorcycle);
+
+        return user;
+    }
+
 
 }
 

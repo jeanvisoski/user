@@ -1,5 +1,6 @@
 package com.br.user.controller;
 
+import com.br.user.entity.Motorcycle;
 import com.br.user.entity.User;
 import com.br.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,13 @@ public class UserController {
         List<User> users = userService.findAll();
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+    @PutMapping("/{userId}/motorcycles/{motorcycleId}")
+    public ResponseEntity<User> updateUserMotorcycle(@PathVariable String userId, @PathVariable Long motorcycleId) {
+        User updatedUser = userService.updateUserMotorcycle(userId, motorcycleId);
+        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+    }
+
 
 }
 
